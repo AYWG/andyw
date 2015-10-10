@@ -5,13 +5,21 @@ import java.util.*;
  */
 public class HtmlValidator {
 
+    // declare queue to be used by HtmlValidator for storing HTML tags
     private Queue<HtmlTag> queueHtmlTag;
 
-    // should initialize your validator to store an empty queue of HTML tags
+    /**
+     * Constructs an empty queue for storing HtmlTag objects
+     */
     public HtmlValidator() {
         queueHtmlTag = new LinkedList<HtmlTag>();
     }
 
+    /**
+     * M
+     * 
+     * @param tags
+     */
     // should initialize your validator with an entirely separate copy of the
     // queue that was passed in. If the queue passed is null, you should throw
     // an IllegalArgumentException. An empty queue (size 0) is allowed.
@@ -20,14 +28,14 @@ public class HtmlValidator {
         if (tags == null) {
             throw new IllegalArgumentException();
         }
-        
+
         queueHtmlTag = new LinkedList<HtmlTag>();
-        
-        for(HtmlTag tag : tags){
+
+        for (HtmlTag tag : tags) {
             queueHtmlTag.add(tag.clone());
         }
 
-        //Queue<HtmlTag> queueHtmlTag = new LinkedList<HtmlTag>(tags);
+        // Queue<HtmlTag> queueHtmlTag = new LinkedList<HtmlTag>(tags);
         // new LinkedList(tags);
         // Queue <HtmlTag> tags = new LinkedList <HtmlTag>();
     }
@@ -83,33 +91,26 @@ public class HtmlValidator {
             }
         }
 
-        /*
-         * for (HtmlTag tag : queueHtmlTag) { if
-         * (tag.getElement().equals(element)) { //yeah, I can't modify this
-         * while looping queueHtmlTag.remove(tag); } }
-         */
-
     }
 
     /**
-     * should print an indented text representation of the HTML tags in your
-     * queue. Display each tag on its own line. Every opening tag that requires
-     * a closing tag increases the level of indentation of following tags by
-     * four spaces until its closing tag is reached.
+     * Prints an indented text representation should print an indented text
+     * representation of the HTML tags in your queue. Display each tag on its
+     * own line. Every opening tag that requires a closing tag increases the
+     * level of indentation of following tags by four spaces until its closing
+     * tag is reached.
      */
 
     public void validate() {
         MyStack stackHtmlTag = new MyStack();
 
         int countIndent = 0;
-        // four empty spaces
+        // four empty spaces for each indent
         String indent = "    ";
-        // Want to print the indent without skipping to next line
-        // System.out.print(indent);
+
         for (HtmlTag tag : queueHtmlTag) {
 
-            // Opening tag that's not self-closing(probably dont need this
-            // comment)
+            // Opening tag that's not self-closing
             if (tag.isOpenTag() == true && tag.isSelfClosing() == false) {
                 // add to stack, print the indent, print the tag, go to next
                 // line and increment indent
@@ -126,11 +127,11 @@ public class HtmlValidator {
 
                 // Error message when closing tag does not match most recently
                 // opened tag or if there are no open tags at that point
-                if (tag.matches(stackHtmlTag.peek()) == false) {
-                    System.out
-                            .println("ERROR unexpected tag: " + tag.toString());
+                if (stackHtmlTag.isEmpty() == false && tag.matches(stackHtmlTag.peek()) == false) {
+                    System.out.println("ERROR unexpected tag: " + tag.toString());
                     continue;
                 }
+                // Testcase4 is not successful due to unexpected closing tag + empty stack
                 // remove tag from stack, decrease the indent, print the indent,
                 // print the tag, go to next line,
                 stackHtmlTag.pop();
@@ -148,8 +149,10 @@ public class HtmlValidator {
 
         }
 
-        if (stackHtmlTag.isEmpty() == false) {
-
+        // Print error message for each tag that is unclosed;
+        // each unclosed tag should still be on the stack.
+        while (stackHtmlTag.isEmpty() == false) {
+            System.out.println("ERROR unclosed tag: " + stackHtmlTag.pop().toString());
         }
 
     }
