@@ -5,7 +5,6 @@ import ca.ubc.ece.cpen221.mp3.staff.Vertex;
 import java.util.*;
 
 public class AdjacencyListGraph implements Graph {
-    // TODO: Implement this class
 
     // Maps vertices to their adjacency lists
     private Map<Vertex, List<Vertex>> adjLists = new HashMap<Vertex, List<Vertex>>();

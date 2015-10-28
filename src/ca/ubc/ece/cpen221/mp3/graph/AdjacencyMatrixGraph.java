@@ -143,9 +143,8 @@ public class AdjacencyMatrixGraph implements Graph {
                 break;
             }
         }
-        // Note that each row / column value in adjMatrix corresponds to a row /
-        // column in vertices
-        // that is one value higher
+        // Each row / column value in adjMatrix corresponds to a row /
+        // column in vertices that is one value higher
         return (adjMatrix.get(whichRow - 1).get(whichColumn - 1));
 
     }
@@ -227,8 +226,8 @@ public class AdjacencyMatrixGraph implements Graph {
         }
 
         for (Integer column : columnsContainingZero) {
-            // Here, (column -1) corresponds to a -row- of the adjMatrix, and
-            // (whichRow -1) corresponds to a -column- of the adjMatrix
+            // Here, (column -1) corresponds to a row of the adjMatrix, and
+            // (whichRow -1) corresponds to a column of the adjMatrix
             if (adjMatrix.get(column - 1).get(whichRow - 1)) {
                 upstreamNeighborList.add(vertexColumns.get(column));
             }
