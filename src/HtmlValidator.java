@@ -1,7 +1,8 @@
 import java.util.*;
 
-/*
- * This is the HtmlValidator class. You should implement this class.
+/**
+ * This class is used to determine if an HTML file represents a valid sequence
+ * of tags.
  */
 public class HtmlValidator {
 
@@ -16,13 +17,13 @@ public class HtmlValidator {
     }
 
     /**
-     * M
+     * Constructs an entirely separate copy of <b>tags</b>
      * 
      * @param tags
+     *            a queue containing 0 or more HtmlTag objects.
+     * @throws IllegalArgumentException
+     *             if tags is null.
      */
-    // should initialize your validator with an entirely separate copy of the
-    // queue that was passed in. If the queue passed is null, you should throw
-    // an IllegalArgumentException. An empty queue (size 0) is allowed.
     public HtmlValidator(Queue<HtmlTag> tags) {
 
         if (tags == null) {
@@ -35,14 +36,18 @@ public class HtmlValidator {
             queueHtmlTag.add(tag.clone());
         }
 
-        // Queue<HtmlTag> queueHtmlTag = new LinkedList<HtmlTag>(tags);
-        // new LinkedList(tags);
-        // Queue <HtmlTag> tags = new LinkedList <HtmlTag>();
     }
 
-    // In this method you should add the given tag to the end of your
-    // validator's queue. If the tag passed is null, you should throw an
-    // IllegalArgumentException.
+    /**
+     * Adds the given <b>tag</b> to the end of the HtmlValidator queue of HTML
+     * tags.
+     * 
+     * @param tag
+     *            the HtmlTag object to be added to the end of the validator's
+     *            queue of HTML tags.
+     * @throws IllegalArgumentExcetion
+     *             if <b>tag</b> is null
+     */
     public void addTag(HtmlTag tag) {
 
         if (tag == null) {
@@ -54,12 +59,11 @@ public class HtmlValidator {
     }
 
     /**
-     * should return your validator's queue of HTML tags. The queue contains all
-     * tags that were passed to the constructor (if any) in their proper order;
-     * it should also reflect any changes made such as adding tags with addTag
-     * or removing tags with removeAll.
+     * Returns HtmlValidator's queue of HTML tags. All tags that were passed to
+     * the constructor (if any) are in their proper order. Any changes made to
+     * the queue (adding tags, removing tags) are reflected in the queue.
      * 
-     * @return
+     * @return HtmlValidator's queue of HtmlTag objects.
      * 
      */
     public Queue<HtmlTag> getTags() {
@@ -68,12 +72,14 @@ public class HtmlValidator {
     }
 
     /**
-     * In this method you should remove from your validator's queue any tags
-     * that match the given element. Opening and closing tags removed. If
-     * element does not exactly match any tags, queue should not be modified
+     * Removes from the validator's queue any tags that match the given element.
+     * This includes both opening and closing tags. If element does not exactly
+     * match any tags, the queue should not be modified.
      * 
      * @param element
+     *            of the tags that are to be removed
      * @throws IllegalArgumentException
+     *             if <b>element</b> is null
      */
     public void removeAll(String element) {
 
@@ -81,8 +87,8 @@ public class HtmlValidator {
             throw new IllegalArgumentException();
         }
 
-        // for each tag in the queue, check if its element is equal to the given
-        // element. If so, remove it from the queue
+        // Iterate through each tag in the queue and check if the tag's element
+        // matches the given element. If so, remove it from the queue
         Iterator<HtmlTag> iter = queueHtmlTag.iterator();
         while (iter.hasNext()) {
             HtmlTag tag = iter.next();
@@ -94,26 +100,37 @@ public class HtmlValidator {
     }
 
     /**
-     * Prints an indented text representation should print an indented text
-     * representation of the HTML tags in your queue. Display each tag on its
-     * own line. Every opening tag that requires a closing tag increases the
-     * level of indentation of following tags by four spaces until its closing
-     * tag is reached.
+     * Prints an indented text representation of the HTML tags in the
+     * validator's queue. Each tag is displayed on its own line. Every opening
+     * tag that requires a closing tag increases the level of indentation of
+     * following tags by four spaces until its closing tag is reached (which
+     * then decreases the indentation by four spaces).
+     * 
+     * Prints an error message next to a closing tag if it does not match the
+     * most recently opened tag (or if there are currently no open tags).
+     * 
+     * Prints an error message next to any tags that are still open after the
+     * end of the HTML is reached.
      */
 
     public void validate() {
+
+        // Stack for organizing the indentation algorithm
         MyStack stackHtmlTag = new MyStack();
 
-        int countIndent = 0;
         // four empty spaces for each indent
         String indent = "    ";
 
+        int countIndent = 0;
+
         for (HtmlTag tag : queueHtmlTag) {
 
-            // Opening tag that's not self-closing
+            // Check if tag is opening and not self-closing
             if (tag.isOpenTag() == true && tag.isSelfClosing() == false) {
-                // add to stack, print the indent, print the tag, go to next
-                // line and increment indent
+
+                // Add tag to stack, print the current indentation level, print
+                // the tag, go to next line and increase indent
+
                 stackHtmlTag.push(tag);
 
                 for (int i = 0; i < countIndent; i++) {
@@ -123,27 +140,42 @@ public class HtmlValidator {
                 System.out.println(tag.toString());
                 countIndent++;
 
+                // Check if tag is closing
             } else if (tag.isOpenTag() == false) {
 
-                // Error message when closing tag does not match most recently
-                // opened tag or if there are no open tags at that point
-                if (stackHtmlTag.isEmpty() == false && tag.matches(stackHtmlTag.peek()) == false) {
+                // If stack is empty, then there is currently no unclosed tag
+                // that matches the closing tag; print error
+                if (stackHtmlTag.isEmpty()) {
                     System.out.println("ERROR unexpected tag: " + tag.toString());
                     continue;
                 }
-                // Testcase4 is not successful due to unexpected closing tag + empty stack
-                // remove tag from stack, decrease the indent, print the indent,
-                // print the tag, go to next line,
-                stackHtmlTag.pop();
-                countIndent--;
+
+                // If the tag on top of the stack (most recently opened tag)
+                // does not match the closing tag, then print error.
+                else if (tag.matches(stackHtmlTag.peek()) == false) {
+                    System.out.println("ERROR unexpected tag: " + tag.toString());
+                    continue;
+
+                } else {
+
+                    // Remove tag from stack, decrease the indent, print the
+                    // indent, print the tag, go to next line.
+
+                    stackHtmlTag.pop();
+                    countIndent--;
+
+                    for (int i = 0; i < countIndent; i++) {
+                        System.out.print(indent);
+                    }
+
+                    System.out.println(tag.toString());
+                }
+                // when tag is self-closing
+            } else {
 
                 for (int i = 0; i < countIndent; i++) {
                     System.out.print(indent);
                 }
-
-                System.out.println(tag.toString());
-            } else {
-                // when tag is self-closing
                 System.out.println(tag.toString());
             }
 
