@@ -1,0 +1,15 @@
+QUOTE=7
+OR=1
+WHITESPACE=9
+AND=2
+LPAREN=4
+STRING=6
+DOTS=8
+RPAREN=5
+RANGE=3
+'&&'=2
+'..'=8
+'||'=1
+')'=5
+'('=4
+'\"'=7
